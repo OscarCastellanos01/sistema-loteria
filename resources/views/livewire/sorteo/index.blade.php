@@ -62,14 +62,14 @@
     @endif
 
     <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <input type="text" wire:model.debounce.500ms="searchNombre"
+        <input type="text" wire:model.live.debounce.500ms="searchNombre"
             placeholder="Buscar por nombre"
             class="w-full rounded-md border-gray-300 text-sm shadow-sm" />
 
-        <input type="date" wire:model="fechaInicio"
+        <input type="date" wire:model.live="fechaInicio"
             class="w-full rounded-md border-gray-300 text-sm shadow-sm" />
 
-        <input type="date" wire:model="fechaFin"
+        <input type="date" wire:model.live="fechaFin"
             class="w-full rounded-md border-gray-300 text-sm shadow-sm" />
     </div>
 
