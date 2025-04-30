@@ -11,4 +11,9 @@ class Sorteo extends Model
         'fechaSorteo',
         'estadoSorteo'
     ];
+
+    public function compras()
+    {
+        return $this->hasMany(Compra::class, 'sorteoId');
+    }
 }

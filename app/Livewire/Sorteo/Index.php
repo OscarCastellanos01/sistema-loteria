@@ -4,17 +4,32 @@ namespace App\Livewire\Sorteo;
 
 use App\Models\Sorteo;
 use Livewire\Component;
+use Livewire\WithoutUrlPagination;
+use Livewire\WithPagination;
 
 class Index extends Component
 {
+    use WithPagination, WithoutUrlPagination;
+
     public $sorteoId;
     public $nombreSorteo;
     public $fechaSorteo;
+
+    public $searchNombre = '';
+    public $fechaInicio = '';
+    public $fechaFin = '';
 
     protected $rules = [
         'nombreSorteo' => 'required|string|max:255',
         'fechaSorteo' => 'required|date',
     ];
+    
+    public function updated($property)
+    {
+        if (in_array($property, ['searchNombre', 'fechaInicio', 'fechaFin'])) {
+            $this->resetPage();
+        }
+    }
     
     public function edit($id)
     {
@@ -49,7 +64,15 @@ class Index extends Component
 
     public function render()
     {
-        $sorteos = Sorteo::all();
+        $sorteos = Sorteo::withCount('compras')
+        ->when($this->searchNombre, fn($query) =>
+            $query->where('nombreSorteo', 'like', '%' . $this->searchNombre . '%')
+        )
+        ->when($this->fechaInicio && $this->fechaFin, fn($query) =>
+            $query->whereBetween('fechaSorteo', [$this->fechaInicio, $this->fechaFin])
+        )
+        ->orderBy('created_at', 'desc')
+        ->paginate(12);
         
         return view('livewire.sorteo.index', [
             'sorteos' => $sorteos
