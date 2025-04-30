@@ -3,12 +3,12 @@
         <div class="mb-6 p-6 rounded-lg shadow bg-white">
             <h2 class="text-lg font-semibold mb-4">Crear Sorteo</h2>
             @if (session()->has('message'))
-                <div class="mb-4 text-green-600">
+                <div class="my-3 px-4 py-2 rounded bg-green-100 text-green-800 text-sm">
                     {{ session('message') }}
                 </div>
             @endif
             @if (session()->has('error'))
-                <div class="mb-4 text-red-600">
+                <div class="my-3 px-4 py-2 rounded bg-red-100 text-green-800 text-sm">
                     {{ session('error') }}
                 </div>
             @endif
@@ -88,11 +88,16 @@
                     >
                         Números disponibles: {{ 100 - $sorteo->compras_count }} / 100
                     </p>
-                    <p 
-                        class="text-sm text-green-600 font-semibold"
-                    >
+                    <p class="text-sm font-semibold {{ $sorteo->estadoSorteo ? 'text-green-600' : 'text-red-600' }}">
                         Estado: {{ $sorteo->estadoSorteo ? 'Activo' : 'Finalizado' }}
                     </p>
+
+                    @if($sorteo->numeroGanador)
+                        <p class="text-sm text-green-700 font-bold mt-2">
+                            🎉 Número ganador: {{ $sorteo->numeroGanador }} 
+                            - {{ $sorteo->compras->first()->user->name }}
+                        </p>
+                    @endif
                 </div>
 
                 <div class="text-sm text-red-500" wire:ignore>

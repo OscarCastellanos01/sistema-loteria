@@ -17,20 +17,38 @@
                 {{ \Carbon\Carbon::parse($sorteo->fechaSorteo)->format('d/m/Y H:i') }}
             </span>
         </p>
+        @if($sorteo->numeroGanador)
+            <p class="text-sm text-green-700 font-bold mt-2">
+                🎉 Número ganador: {{ $sorteo->numeroGanador }} 
+                - {{ $sorteo->compras->first()->user->name }}
+            </p>
+        @endif
         <p class="text-sm text-red-500" wire:ignore>
             Tiempo restante:
             <span id="countdown" class="font-semibold"></span>
         </p>
+        @if(auth()->user()->hasRole('admin') && is_null($sorteo->numeroGanador) && now()->gte($sorteo->fechaSorteo))
+            <button wire:click="seleccionarGanador({{ $sorteo->id }})"
+                class="mt-3 text-sm px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                Seleccionar ganador
+            </button>
+        @endif
     </div>
 
+    @if ($mensaje)
+        <div class="my-3 px-4 py-2 rounded bg-green-100 text-green-800 text-sm">
+            {{ $mensaje }}
+        </div>
+    @endif
+
     @if (session()->has('message'))
-        <div class="mb-4 text-green-600">
+        <div class="my-3 px-4 py-2 rounded bg-green-100 text-green-800 text-sm">
             {{ session('message') }}
         </div>
     @endif
 
     @if (session()->has('error'))
-        <div class="mb-4 text-red-600">
+        <div class="my-3 px-4 py-2 rounded bg-red-100 text-green-800 text-sm">
             {{ session('error') }}
         </div>
     @endif

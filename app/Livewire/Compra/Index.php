@@ -13,6 +13,7 @@ class Index extends Component
     public $sorteo;
     public $numeroCompra;
     public bool $sorteoActivo = true;
+    public string $mensaje = '';
 
     protected $rules = [
         'numeroCompra' => 'required|integer|min:1|max:100',
@@ -64,6 +65,38 @@ class Index extends Component
         $this->reset('numeroCompra');
     }
 
+    public function seleccionarGanador($sorteoId)
+    {
+        $sorteo = Sorteo::with('compras')->findOrFail($sorteoId);
+
+        if ($sorteo->numeroGanador) {
+            session()->flash('message', 'Este sorteo ya tiene un ganador.');
+            return;
+        }
+
+        if ($sorteo->compras->isEmpty()) {
+            session()->flash('message', 'No hay números comprados en este sorteo.');
+            return;
+        }
+
+        $ganador = $sorteo->compras->random();
+
+        $sorteo->update([
+            'numeroGanador' => $ganador->numeroCompra,
+            'estadoSorteo' => false
+        ]);
+
+        $this->dispatch('refresh');
+
+        $this->mensaje = '🎉 Ganador seleccionado: número ' . $ganador->numeroCompra . ' - ' . $sorteo->compras->first()->user->name;
+    }
+    
+    #[On('refresh')]
+    public function refreshComponent()
+    {
+        $this->sorteo = $this->sorteo->fresh();
+    }
+
     public function render()
     {
         $numerosComprados = Compra::where('sorteoId', $this->sorteo->id)
@@ -72,6 +105,7 @@ class Index extends Component
 
         $this->sorteoActivo = now()->lessThan($this->sorteo->fechaSorteo);
 
+        
         return view('livewire.compra.index', [
             'numerosComprados' => $numerosComprados,
         ]);

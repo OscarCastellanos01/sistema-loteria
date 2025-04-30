@@ -9,6 +9,7 @@ class Sorteo extends Model
     protected $fillable = [
         'nombreSorteo',
         'fechaSorteo',
+        'numeroGanador',
         'estadoSorteo'
     ];
 
